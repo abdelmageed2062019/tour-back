@@ -3,11 +3,11 @@ const Booking = require("../models/Booking");
 const User = require("../models/User");
 const router = express.Router();
 const auth = require("../middleware/auth");
-const admin = require("../middleware/admin"); // Import the admin middleware
+const admin = require("../middleware/admin");
 const { parse } = require("json2csv");
 const axios = require("axios");
 require("dotenv").config();
-const getExchangeRate = require("./exchange-api");
+const { getExchangeRate } = require("./exchange-api");
 
 // Create a new booking and process payment
 router.post("/", auth, async (req, res) => {
@@ -29,7 +29,7 @@ router.post("/", auth, async (req, res) => {
     time,
     cellPhone,
     paymentName,
-    amount, // Amount is in USD
+    amount,
     apartment,
     floor,
     street,
@@ -74,7 +74,7 @@ router.post("/", auth, async (req, res) => {
       time,
       cellPhone,
       paymentName,
-      amount: amountInEGP, // Store amount in EGP in your database
+      amount: amountInEGP,
       status: "pending",
     });
 
@@ -116,7 +116,7 @@ router.post("/", auth, async (req, res) => {
       paymentRequest,
       {
         headers: {
-          Authorization: `Bearer ${process.env.PAYMOB_SECRET_KEY_TEST}`,
+          Authorization: `Bearer ${process.env.PAYMOB_SECRET_KEY}`,
         },
       }
     );

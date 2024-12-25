@@ -13,3 +13,4 @@ async function getExchangeRate() {
     throw new Error("Could not fetch exchange rate");
   }
 }
+module.exports = { getExchangeRate };

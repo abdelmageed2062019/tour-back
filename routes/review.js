@@ -11,7 +11,7 @@ router.post("/:tourId", auth, upload.array("media", 10), async (req, res) => {
   try {
     const { rating, comment } = req.body;
     const { tourId } = req.params;
-    const userId = req.user._id; // Get user ID from the authenticated user
+    const userId = req.user?.userId; // Get user ID from the authenticated user
 
     // Map uploaded media files to objects containing URL and type
     const media = req.files.map((file) => ({
@@ -23,6 +23,10 @@ router.post("/:tourId", auth, upload.array("media", 10), async (req, res) => {
     const tour = await Tour.findById(tourId);
     if (!tour) {
       return res.status(404).json({ error: "Tour not found" });
+    }
+
+    if (!userId) {
+      return res.status(400).json({ error: "User is not authenticated" });
     }
 
     // Create and save the review in the Review collection

@@ -10,7 +10,7 @@ const bookingRoutes = require("./routes/booking");
 const reviewRoutes = require("./routes/review");
 const vipRoutes = require("./routes/vip");
 const nileRoutes = require("./routes/nile");
-
+const contactRoutes = require("./routes/contact");
 const path = require("path");
 
 const cors = require("cors");
@@ -40,6 +40,7 @@ app.use("/api/bookings", bookingRoutes);
 app.use("/api/reviews", reviewRoutes);
 app.use("/api/vip", vipRoutes);
 app.use("/api/nile", nileRoutes);
+app.use("/api/contact", contactRoutes);
 
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
