@@ -16,7 +16,7 @@ const tourSchema = new mongoose.Schema({
   viewPrice: { type: String, required: true },
   note: { type: String },
   description: { type: String, required: true },
-  media: { type: [mediaSchema], default: [] },
+  media: { type: mediaSchema }, // Changed to a single image
   createdBy: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
   createdAt: { type: Date, default: Date.now },
   type: { type: String },

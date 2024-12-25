@@ -25,7 +25,7 @@ router.post(
   "/create",
   auth,
   admin,
-  upload.array("media", 10), // Allow multiple media uploads
+  upload.single("media"), // Allow multiple media uploads
   [
     body("title").notEmpty().withMessage("Title is required."),
     body("duration").notEmpty().withMessage("Duration is required."),
@@ -114,7 +114,7 @@ router.put(
   "/update",
   auth,
   admin,
-  upload.array("media", 10), // Allow multiple media uploads
+  upload.single("media"), // Allow multiple media uploads
   [
     body("title").notEmpty().withMessage("Title is required."),
     body("duration").notEmpty().withMessage("Duration is required."),
@@ -150,23 +150,22 @@ router.put(
       city,
     } = req.body;
 
-    const media = req.files.map((file) => {
-      // Additional validation for file type (optional)
+    let media = null;
+    if (req.file) {
+      // Validate file type and construct the URL
       if (
-        !file.mimetype.startsWith("image") &&
-        !file.mimetype.startsWith("video")
+        !req.file.mimetype.startsWith("image") &&
+        !req.file.mimetype.startsWith("video")
       ) {
-        throw new Error(`Unsupported file type: ${file.mimetype}`);
+        return res.status(400).json({ error: "Unsupported file type." });
       }
-
-      // Construct the URL using forward slashes
-      return {
+      media = {
         url: `${req.protocol}://${req.get(
           "host"
-        )}/uploads/${file.filename.replace(/\\/g, "/")}`,
-        type: file.mimetype.startsWith("image") ? "image" : "video",
+        )}/uploads/${req.file.filename.replace(/\\/g, "/")}`,
+        type: req.file.mimetype.startsWith("image") ? "image" : "video",
       };
-    });
+    }
 
     try {
       const updatedTour = await Nile.findOneAndUpdate(

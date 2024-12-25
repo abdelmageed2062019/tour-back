@@ -7,6 +7,7 @@ const admin = require("../middleware/admin"); // Import the admin middleware
 const { parse } = require("json2csv");
 const axios = require("axios");
 require("dotenv").config();
+const getExchangeRate = require("./exchange-api");
 
 // Create a new booking and process payment
 router.post("/", auth, async (req, res) => {
@@ -28,7 +29,7 @@ router.post("/", auth, async (req, res) => {
     time,
     cellPhone,
     paymentName,
-    amount,
+    amount, // Amount is in USD
     apartment,
     floor,
     street,
@@ -44,6 +45,15 @@ router.post("/", auth, async (req, res) => {
     if (!user) {
       return res.status(404).json({ message: "User not found" });
     }
+
+    // Fetch exchange rate from USD to EGP
+    const exchangeRate = await getExchangeRate();
+    if (!exchangeRate) {
+      return res.status(500).json({ message: "Failed to fetch exchange rate" });
+    }
+
+    // Convert the amount to EGP
+    const amountInEGP = amount * exchangeRate;
 
     // Create a new booking
     const newBooking = new Booking({
@@ -64,7 +74,7 @@ router.post("/", auth, async (req, res) => {
       time,
       cellPhone,
       paymentName,
-      amount,
+      amount: amountInEGP, // Store amount in EGP in your database
       status: "pending",
     });
 
@@ -86,11 +96,11 @@ router.post("/", auth, async (req, res) => {
       state,
     };
 
-    const amountInCents = amount * 100;
+    const amountInCents = amountInEGP * 100; // Paymob expects amount in cents
 
     const paymentRequest = {
       amount: amountInCents,
-      currency: "USD",
+      currency: "EGP", // Now using EGP for Paymob
       payment_methods: [4888997],
       items: [],
       billing_data: billingData,
